@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>产品经理填写数据文档系统v1.0</title>
+    <link rel="stylesheet" href="css/base.css" />
+    <script src="scripts/react.min.js"></script>
+    <script src="scripts/react-dom.min.js"></script>
+    <script src="scripts/browser.min.js"></script>
+    <script src="scripts/jquery.min.js"></script>
+  </head>
+  <body>
+    <div id="content"></div>
+    <script type="text/babel">
+      var CommentBox = React.createClass({
+        getInitialState: function() {
+          return {data: {}, num:1};
+        },
+        loadCommentsFromServer: function() {
+            $.ajax({
+              url: this.props.url,
+              dataType: 'json',
+              cache: false,
+              success: function(data) {
+                this.setState({data: data});
+              }.bind(this),
+              error: function(xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+              }.bind(this)
+            });
+          },
+        handleCommentSubmit: function(comment) {
+            var comments = this.state.data;
+            comments[comment.comid] = comment;
+            this.setState({data: comments});
+            $.ajax({
+                  url: this.props.url,
+                  dataType: 'json',
+                  type: 'POST',
+                  data: comment,
+                  success: function(data) {
+                    this.setState({data: data});
+                  }.bind(this),
+                  error: function(xhr, status, err) {
+                    console.error(this.props.url, status, err.toString());
+                  }.bind(this)
+            });
+        },
+        handleCommentDel: function(comment) {
+            var comments = this.state.data;
+            delete comments[comment.comid];
+            this.setState({data: comments});
+            $.ajax({
+                  url: this.props.url,
+                  dataType: 'json',
+                  type: 'DELETE',
+                  data: comment,
+                  success: function(data) {
+                    this.setState({data: data});
+                  }.bind(this),
+                  error: function(xhr, status, err) {
+                    console.error(this.props.url, status, err.toString());
+                  }.bind(this)
+            });
+        },
+        handleCommentUpd: function(comment) {
+            var comments = this.state.data;
+            comments[comment.comid] = comment;
+            this.setState({data: comments});
+            $.ajax({
+                  url: this.props.url,
+                  dataType: 'json',
+                  type: 'PUT',
+                  data: comment,
+                  success: function(data) {
+                    this.setState({data: data});
+                  }.bind(this),
+                  error: function(xhr, status, err) {
+                    console.error(this.props.url, status, err.toString());
+                  }.bind(this)
+            });
+        },     
+        componentDidMount: function() {
+            this.loadCommentsFromServer();
+            setInterval(this.loadCommentsFromServer, this.props.pollInterval);
+        },
+        togglePal: function(){
+            $(".commentForm").toggle();
+        },
+        changeColor: function(){
+            var colorSet = ["#DDD","#4183C4","#C041C4","#41C4B0","#7BC441","#C49A41","#ACFF00","#782084","transparent","#000"];
+            var value = Math.floor(Math.random() * 10);
+            if(value === 9){
+                $(".commentForm").css({
+                  'background-color': colorSet[value],
+                  'color': '#fff'
+                });
+            }else{
+                $(".commentForm").css('background-color', colorSet[value]);
+            };
+        },
+        cleardata: function(){
+            this.setState({data: {}});
+            $.ajax({
+                  url: this.props.globalurl,
+                  dataType: 'json',
+                  type: 'DELETE',
+                  success: function(data) {
+                    this.setState({data: data});
+                  }.bind(this),
+                  error: function(xhr, status, err) {
+                    console.error(this.props.url, status, err.toString());
+                  }.bind(this)
+            });
+        },
+        changedata: function(){
+            this.setState({data: {}, num: this.domnum()});
+            $.ajax({
+              url: this.props.globalurl,
+              dataType: 'json',
+              cache: false,
+              success: function(data) {
+                this.setState({data: data});
+              }.bind(this),
+              error: function(xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+              }.bind(this)
+            });
+        },
+        domnum: function(){
+            return this.state.num === 5 ? 1 : ++this.state.num;
+        },
+        render: function() {
+         return (
+               <div className="commentBox">
+                 <h1 className="title">产品经理填写数据文档系统v1.0</h1>
+                 <h4 className="des">Created and maintained by Adam Zhu, any questions please call +86 18622963721 or send emai to zhuyuzhang02@58ganji.com</h4>
+                 <div className="panel"><input type="button" value="显示或隐藏操作面板" onClick={this.togglePal}/></div>
+                 <div className="changecolor"><input type="button" value="切换操作面板皮肤" onClick={this.changeColor}/></div>
+                 <div className="cleardata"><input type="button" value="清空当前数据文档" onClick={this.cleardata}/></div>
+                 <div className="changedata"><input type="button" value="切换当前数据文档" onClick={this.changedata}/><span className="domnum" >数据文档：{this.state.num}</span></div>
+                 <CommentList data={this.state.data} onCommentDel={this.handleCommentDel}/>
+                 <CommentForm onCommentSubmit={this.handleCommentSubmit} onCommentUpd={this.handleCommentUpd}/>
+               </div>
+             );
+        }
+      });
+
+      var CommentList = React.createClass({
+        render: function() {
+            var dataArray = [];
+            var data = this.props.data;
+            for (var i in data) {
+                  dataArray.push(data[i]);
+            };
+            var delHander = this.props.onCommentDel;
+            var commentNodes = dataArray.map(function(comment) {
+              return (
+                  <Comment data={comment} onCommentDel={delHander}></Comment>
+              );
+            });
+            return (
+                  <div className="commentList">
+                          {commentNodes}
+                  </div>
+            );
+        }
+      });
+
+      var Comment = React.createClass({
+        handleDel: function(e) {
+          e.preventDefault();
+          this.props.onCommentDel(this.props.data);
+        },
+        render: function() {
+          return (
+            <div className="comment">
+              <div className="comid">
+                公司id：{this.props.data.comid}
+              </div>
+              <div className="comName">
+                公司名称：{this.props.data.comName}
+              </div>
+              <div className="comMark">
+                公司标签：{this.props.data.comMark}
+              </div>
+              <div className="comDes">
+                公司简介：{this.props.data.comDes}
+              </div>
+              <div className="welMark">
+                福利标签：{this.props.data.welMark}
+              </div>
+              <div className="bossNum">
+                Boss人数：{this.props.data.bossNum}
+              </div>
+              <div className="boss">
+                Boss：{this.props.data.boss}
+              </div>
+              <div className="timeLineNum">
+                时间线数量：{this.props.data.timeLineNum}
+              </div>
+              <div className="timeLine">
+                时间线：{this.props.data.timeLine}
+              </div>
+              <div className="picNum">
+                图片数量：{this.props.data.picNum}
+              </div>
+              <div className="shareTitle">
+                分享标题：{this.props.data.shareTitle}
+              </div>
+              <div className="shareContent">
+                分享内容：{this.props.data.shareContent}
+              </div>
+                <input type="button" value="删除此项信息" onClick={this.handleDel}/>
+            </div>
+          );
+        }
+      });
+
+      var CommentForm = React.createClass({
+        getInitialState: function() {
+          return {
+              comid: "",
+              comName: "",
+              comMark: "",
+              welMark: "",
+              comDes: "",
+              bossNum: "",
+              boss: "",
+              timeLineNum: "",
+              timeLine: "",
+              picNum: "",
+              shareTitle: "",
+              shareContent: ""
+             };
+        },
+        handleComidChange: function(e) {
+          this.setState({comid: e.target.value});
+        },
+        handleComNameChange: function(e) {
+          this.setState({comName: e.target.value});
+        },
+        handleComMarkChange: function(e) {
+          this.setState({comMark: e.target.value});
+        },
+        handleComDesChange: function(e) {
+          this.setState({comDes: e.target.value});
+        },        
+        handleBossNumChange: function(e) {
+          this.setState({bossNum: e.target.value});
+        },
+        handleTimeLineNumChange: function(e) {
+          this.setState({timeLineNum: e.target.value});
+        },
+        handlePicNumChange: function(e) {
+          this.setState({picNum: e.target.value});
+        },
+        handleShareTitleChange: function(e) {
+          this.setState({shareTitle: e.target.value});
+        },
+        handleShareContentChange: function(e) {
+          this.setState({shareContent: e.target.value});
+        },
+        handleWelMarkChange: function(e) {
+          this.setState({welMark: e.target.value});
+        },
+        handleBossChange: function(e) {
+          this.setState({boss: e.target.value});
+        },
+        handleTimeLineChange: function(e) {
+          this.setState({timeLine: e.target.value});
+        },
+        handleSubmit: function(e) {
+          e.preventDefault();
+          var comid = this.state.comid.trim();
+          var comName = this.state.comName.trim();
+          var comMark = this.state.comMark.trim();
+          var comDes = this.state.comDes.trim();
+          var bossNum = this.state.bossNum.trim();
+          var timeLineNum = this.state.timeLineNum.trim();
+          var picNum = this.state.picNum.trim();
+          var shareTitle = this.state.shareTitle.trim();
+          var shareContent = this.state.shareContent.trim();
+          var welMark = this.state.welMark.trim();
+          var boss = this.state.boss.trim();
+          var timeLine = this.state.timeLine.trim();
+          if (!comid || !comName || !comMark || !comDes || !bossNum || !timeLineNum || !picNum || !shareTitle || !shareContent || !welMark || !boss || !timeLine) {
+              return;
+          }
+          this.props.onCommentSubmit({
+              comid: comid,
+              comName: comName,
+              comMark: comMark,
+              welMark: welMark,
+              comDes: comDes,
+              bossNum: bossNum,
+              boss: boss,
+              timeLineNum: timeLineNum,
+              timeLine: timeLine,
+              picNum: picNum,
+              shareTitle: shareTitle,
+              shareContent: shareContent
+          });
+          this.setState({
+              comid: "",
+              comName: "",
+              comMark: "",
+              welMark: "",
+              comDes: "",
+              bossNum: "",
+              boss: "",
+              timeLineNum: "",
+              timeLine: "",
+              picNum: "",
+              shareTitle: "",
+              shareContent: ""
+           });
+        },
+        handleUpd: function(e) {
+          e.preventDefault();
+          var comid = this.state.comid.trim();
+          var comName = this.state.comName.trim();
+          var comMark = this.state.comMark.trim();
+          var comDes = this.state.comDes.trim();
+          var bossNum = this.state.bossNum.trim();
+          var timeLineNum = this.state.timeLineNum.trim();
+          var picNum = this.state.picNum.trim();
+          var shareTitle = this.state.shareTitle.trim();
+          var shareContent = this.state.shareContent.trim();
+          var welMark = this.state.welMark.trim();
+          var boss = this.state.boss.trim();
+          var timeLine = this.state.timeLine.trim();
+          if (!comid || !comName || !comMark || !comDes || !bossNum || !timeLineNum || !picNum || !shareTitle || !shareContent || !welMark || !boss || !timeLine) {
+              return;
+          }
+          this.props.onCommentUpd({
+              comid: comid,
+              comName: comName,
+              comMark: comMark,
+              welMark: welMark,
+              comDes: comDes,
+              bossNum: bossNum,
+              boss: boss,
+              timeLineNum: timeLineNum,
+              timeLine: timeLine,
+              picNum: picNum,
+              shareTitle: shareTitle,
+              shareContent: shareContent
+          });
+          this.setState({
+              comid: "",
+              comName: "",
+              comMark: "",
+              welMark: "",
+              comDes: "",
+              bossNum: "",
+              boss: "",
+              timeLineNum: "",
+              timeLine: "",
+              picNum: "",
+              shareTitle: "",
+              shareContent: ""
+           });
+        },
+        render: function() {
+          return (
+            <form className="commentForm" onSubmit={this.handleSubmit}>
+              <div>公司id：
+              <input
+                type="text"
+                placeholder="公司id"
+                value={this.state.comid}
+                onChange={this.handleComidChange}
+                required
+              /></div>
+              <div>公司名称：
+              <input
+                type="text"
+                placeholder="公司名称："
+                value={this.state.comName}
+                onChange={this.handleComNameChange}
+                required
+              /></div>
+              <div>公司标签：
+              <input
+                type="text"
+                placeholder="公司标签："
+                value={this.state.comMark}
+                onChange={this.handleComMarkChange}
+                required
+              /></div>
+              <div>公司简介：
+              <input
+                type="text"
+                placeholder="公司简介："
+                value={this.state.comDes}
+                onChange={this.handleComDesChange}
+                required
+              /></div>
+              <div>福利标签：
+              <textarea placeholder="福利标签：" 
+                rows="5" 
+                cols="30" 
+                onChange={this.handleWelMarkChange}
+                required
+                value={this.state.welMark}>
+              </textarea>
+              </div>
+              <div>Boss人数：
+              <input
+                type="text"
+                placeholder="Boss人数："
+                value={this.state.bossNum}
+                onChange={this.handleBossNumChange}
+                required
+              /></div>
+              <div>Boss：
+              <textarea placeholder="Boss：" 
+                rows="5" 
+                cols="30" 
+                onChange={this.handleBossChange}
+                required
+                value={this.state.boss}>
+              </textarea>
+              </div>
+              <div>时间线数量：
+              <input
+                type="text"
+                placeholder="时间线数量："
+                value={this.state.timeLineNum}
+                onChange={this.handleTimeLineNumChange}
+                required
+              /></div>
+              <div>时间线：
+              <textarea placeholder="时间线：" 
+                rows="5" 
+                cols="30" 
+                onChange={this.handleTimeLineChange}
+                required
+                value={this.state.timeLine}>
+              </textarea>
+              </div>
+              <div>图片数量：
+              <input
+                type="text"
+                placeholder="图片数量："
+                value={this.state.picNum}
+                onChange={this.handlePicNumChange}
+                required
+              /></div>
+              <div>分享标题：
+              <input
+                type="text"
+                placeholder="分享标题："
+                value={this.state.shareTitle}
+                onChange={this.handleShareTitleChange}
+                required
+              /></div>
+              <div>分享内容：
+              <input
+                type="text"
+                placeholder="分享内容"
+                value={this.state.shareContent}
+                onChange={this.handleShareContentChange}
+                required
+              /></div>
+              <input type="submit" value="新建公司信息" />&nbsp;&nbsp;&nbsp;
+              <input type="button" value="更新公司信息" onClick={this.handleUpd}/>
+            </form>
+          );
+        }
+      });
+
+      ReactDOM.render(
+        <CommentBox url="/api/comments" globalurl="/api/global" pollInterval={200000}/>,
+        document.getElementById('content')
+      );
+    </script>
+  </body>
+</html>

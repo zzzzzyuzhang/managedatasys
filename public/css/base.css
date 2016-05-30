@@ -1,0 +1,124 @@
+body {
+  background: #fff;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 0;
+  padding: 30px;
+}
+
+a {
+  color: #4183c4;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code {
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  font-family: "Bitstream Vera Sans Mono", Consolas, Courier, monospace;
+  font-size: 12px;
+  margin: 0 2px;
+  padding: 0 5px;
+}
+
+h1, h2, h3, h4 {
+  font-weight: bold;
+  margin: 0 0 15px;
+  padding: 0;
+}
+
+h1 {
+  border-bottom: 1px solid #ddd;
+  font-size: 2.5em;
+  font-weight: bold;
+  margin: 0 0 15px;
+  padding: 0;
+}
+
+h2 {
+  border-bottom: 1px solid #eee;
+  font-size: 2em;
+}
+
+h3 {
+  font-size: 1.5em;
+}
+
+h4 {
+  font-size: 1.2em;
+}
+
+p, ul {
+  margin: 15px 0;
+}
+
+ul {
+  padding-left: 30px;
+}
+.comment div{
+  margin-bottom: 20px;
+}
+.title{
+  margin: 0 auto;
+  width: 100%;
+  text-align: center;
+}
+.des{
+  margin: 0 auto 30px;
+  width: 100%;
+  text-align: center;
+}
+.commentForm{
+  display: none;
+  position: fixed;
+  right: 0;
+  top:0;
+  background-color:transparent;
+}
+.panel{
+   position: fixed;
+   left: 0;
+   top:0;
+}
+.changecolor{
+  position:fixed;
+  left:150px;
+  top:0;
+}
+.cleardata{
+  position:fixed;
+  left:287px;
+  top:0;
+}
+.changedata{
+  position:fixed;
+  left:425px;
+  top:0;
+}
+.domnum{
+  margin-left: 10px;
+}
+.commentForm div{
+  margin-bottom: 15px;
+}
+.commentForm textarea{
+  vertical-align: text-top;
+}
+.commentList{
+  overflow: hidden;
+}
+.comment{
+  width:50%;
+  float: left;
+  margin-bottom: 50px;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+.comment>div{
+  word-break: break-all;
+}
