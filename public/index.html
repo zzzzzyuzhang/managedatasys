@@ -362,6 +362,22 @@
               shareContent: ""
            });
         },
+        clearPanel: function(){
+            this.setState({
+                comid: "",
+                comName: "",
+                comMark: "",
+                welMark: "",
+                comDes: "",
+                bossNum: "",
+                boss: "",
+                timeLineNum: "",
+                timeLine: "",
+                picNum: "",
+                shareTitle: "",
+                shareContent: ""
+             });
+        },
         render: function() {
           return (
             <form className="commentForm" onSubmit={this.handleSubmit}>
@@ -464,8 +480,9 @@
                 onChange={this.handleShareContentChange}
                 required
               /></div>
-              <input type="submit" value="新建公司信息" />&nbsp;&nbsp;&nbsp;
-              <input type="button" value="更新公司信息" onClick={this.handleUpd}/>
+              <input type="submit" value="新建公司信息" />&nbsp;&nbsp;
+              <input type="button" value="更新公司信息" onClick={this.handleUpd}/>&nbsp;&nbsp;
+              <input type="button" value="清空操作面板" onClick={this.clearPanel}/>
             </form>
           );
         }
