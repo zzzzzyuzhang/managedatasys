@@ -32,6 +32,7 @@ app.get('/api/comments', function(req, res) {
         data[i]['boss'] = bosstoStrHandler(data[i]['boss']);
         data[i]['timeLine'] = timeLinetoStrHandler(data[i]['timeLine']);
     };
+    data.num = num;
     res.json(data);
   });
 });
@@ -162,6 +163,7 @@ app.get('/api/global', function(req, res) {
           data[i]['boss'] = bosstoStrHandler(data[i]['boss']);
           data[i]['timeLine'] = timeLinetoStrHandler(data[i]['timeLine']);
       };
+      data.num = num;
       res.json(data);
     });
 });

@@ -22,7 +22,9 @@
               dataType: 'json',
               cache: false,
               success: function(data) {
-                this.setState({data: data});
+                var num = data['num'] + 1;
+                delete data['num'];
+                this.setState({data: data, num:num});
               }.bind(this),
               error: function(xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
@@ -120,7 +122,9 @@
               dataType: 'json',
               cache: false,
               success: function(data) {
-                this.setState({data: data});
+                var num = data['num'] + 1;
+                delete data['num'];
+                this.setState({data: data, num:num});
               }.bind(this),
               error: function(xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
