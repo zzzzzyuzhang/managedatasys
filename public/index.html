@@ -102,18 +102,24 @@
             };
         },
         cleardata: function(){
-            this.setState({data: {}});
-            $.ajax({
-                  url: this.props.globalurl,
-                  dataType: 'json',
-                  type: 'DELETE',
-                  success: function(data) {
-                    this.setState({data: data});
-                  }.bind(this),
-                  error: function(xhr, status, err) {
-                    console.error(this.props.url, status, err.toString());
-                  }.bind(this)
-            });
+            var password = window.prompt("请输入密码","password");
+            if(password !== "pm000"){
+                alert("密码错误，删除失败！");
+                return;
+            }else{
+                this.setState({data: {}});
+                $.ajax({
+                      url: this.props.globalurl,
+                      dataType: 'json',
+                      type: 'DELETE',
+                      success: function(data) {
+                        this.setState({data: data});
+                      }.bind(this),
+                      error: function(xhr, status, err) {
+                        console.error(this.props.url, status, err.toString());
+                      }.bind(this)
+                });
+            };
         },
         changedata: function(){
             this.setState({data: {}, num: this.domnum()});
@@ -174,7 +180,13 @@
       var Comment = React.createClass({
         handleDel: function(e) {
           e.preventDefault();
-          this.props.onCommentDel(this.props.data);
+          var password = window.prompt("请输入密码","password");
+          if(password !== "pm000"){
+              alert("密码错误，删除失败！");
+              return;
+          }else{
+              this.props.onCommentDel(this.props.data);
+          };
         },
         render: function() {
           return (
